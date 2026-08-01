@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+""""
 RAG evaluation runner, used as a CI quality gate before deploying a new
 build. Exits non-zero (failing the CI job) if metrics fall below threshold.
 
@@ -9,7 +9,7 @@ If you switch RAG_EMBEDDER_BACKEND to sentence-transformers for production,
 re-calibrate these thresholds against a held-out eval set on that backend --
 semantic embedding similarity scores are not directly comparable across
 embedding backends.
-"""
+""""
 
 import argparse
 import asyncio
