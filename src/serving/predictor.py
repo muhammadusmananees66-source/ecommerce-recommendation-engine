@@ -51,21 +51,6 @@
 #         self._executor.shutdown(wait=True)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 """
 Serving-time wrapper around HybridRecommender. Model inference (numpy matrix
 ops) is synchronous/CPU-bound, so it's offloaded to a thread pool from the
@@ -105,7 +90,8 @@ class Predictor:
             logger.warning(
                 "Recommendation requested for user '%s' but no model is trained/loaded yet; "
                 "returning empty list rather than a 502 -- this is expected before the first "
-                "training run, not a service failure.", user_id,
+                "training run, not a service failure.",
+                user_id,
             )
             return []
         loop = asyncio.get_running_loop()

@@ -70,7 +70,7 @@ class MatrixFactorizationModel:
                 self.user_factors[u] += lr * (err * self.item_factors[i] - reg * self.user_factors[u])
                 self.item_factors[i] += lr * (err * uf - reg * self.item_factors[i])
 
-                sq_err_sum += err ** 2
+                sq_err_sum += err**2
 
             train_loss = sq_err_sum / n
             history["train_loss"].append(train_loss)
@@ -86,19 +86,26 @@ class MatrixFactorizationModel:
                 else:
                     no_improve += 1
                     if no_improve >= patience:
-                        logger.info("Early stopping MF training at epoch %d (val_loss=%.4f)", epoch + 1, val_loss)
+                        logger.info(
+                            "Early stopping MF training at epoch %d (val_loss=%.4f)", epoch + 1, val_loss
+                        )
                         break
 
             logger.info(
                 "MF epoch %d/%d train_loss=%.4f%s",
-                epoch + 1, epochs, train_loss,
+                epoch + 1,
+                epochs,
+                train_loss,
                 f" val_loss={val_loss:.4f}" if val_loss is not None else "",
             )
         return history
 
     def _predict_single(self, u: int, i: int) -> float:
         return float(
-            self.global_bias + self.user_bias[u] + self.item_bias[i] + self.user_factors[u] @ self.item_factors[i]
+            self.global_bias
+            + self.user_bias[u]
+            + self.item_bias[i]
+            + self.user_factors[u] @ self.item_factors[i]
         )
 
     def predict_all_items(self, user_idx: int, item_indices: np.ndarray) -> np.ndarray:
@@ -152,17 +159,23 @@ class HybridRecommender:
             dim=self.config.get("embedding_dim", 32),
         )
         history = self.collab_model.fit(
-            user_idx[train_idx], item_idx[train_idx], ratings[train_idx],
+            user_idx[train_idx],
+            item_idx[train_idx],
+            ratings[train_idx],
             epochs=self.config.get("epochs", 20),
             lr=self.config.get("lr", 0.01),
-            val_user_idx=user_idx[val_idx], val_item_idx=item_idx[val_idx], val_ratings=ratings[val_idx],
+            val_user_idx=user_idx[val_idx],
+            val_item_idx=item_idx[val_idx],
+            val_ratings=ratings[val_idx],
         )
 
         self.is_fitted = True
         logger.info("HybridRecommender fitted successfully")
         return history
 
-    def recommend(self, user_id: str, n: int = 10, user_items: Optional[List[str]] = None, **kwargs) -> List[Dict]:
+    def recommend(
+        self, user_id: str, n: int = 10, user_items: Optional[List[str]] = None, **kwargs
+    ) -> List[Dict]:
         if not self.is_fitted:
             raise RuntimeError("Model not fitted -- call fit() or load() first")
         if user_id not in self.user_encoder:
@@ -184,8 +197,12 @@ class HybridRecommender:
         order = np.argsort(combined)[::-1][:n]
 
         return [
-            {"item_id": item_list[i], "score": float(combined[i]),
-             "collab_score": float(collab_scores[i]), "content_score": float(content_scores[i])}
+            {
+                "item_id": item_list[i],
+                "score": float(combined[i]),
+                "collab_score": float(collab_scores[i]),
+                "content_score": float(content_scores[i]),
+            }
             for i in order
         ]
 

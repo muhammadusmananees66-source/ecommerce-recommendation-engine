@@ -50,7 +50,9 @@ class RAGPipeline:
         self.retriever = MultiStageRetriever(config.get("retriever", {}))
         self.llm_router = LLMRouter(config.get("llm", {}))
         self.response_generator = ResponseGenerator(config.get("generator", {}))
-        self.groundedness_checker = GroundednessChecker(config.get("groundedness", {}), embedder=self.embedder)
+        self.groundedness_checker = GroundednessChecker(
+            config.get("groundedness", {}), embedder=self.embedder
+        )
         self.semantic_cache = SemanticCache(config.get("cache", {}), embedder=self.embedder)
         self.context_builder = ContextBuilder(config.get("context", {}))
         self.relevance_ranker = RelevanceRanker(config.get("ranking", {}), embedder=self.embedder)
@@ -109,7 +111,9 @@ class RAGPipeline:
 
         prompt = f"Query: {context['query']}\n\n{context['text']}"
         response, model_used = await self.response_generator.generate_with_fallback(
-            prompt=prompt, model=llm_config["model"], temperature=temperature,
+            prompt=prompt,
+            model=llm_config["model"],
+            temperature=temperature,
         )
 
         groundedness = await self.groundedness_checker.check(query, response, docs)

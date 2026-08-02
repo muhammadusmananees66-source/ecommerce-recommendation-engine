@@ -100,8 +100,11 @@ def main():
 
     result = asyncio.run(
         run_evaluation(
-            args.test_data, args.seed_items, args.threshold_faithfulness,
-            args.threshold_relevancy, args.output_file,
+            args.test_data,
+            args.seed_items,
+            args.threshold_faithfulness,
+            args.threshold_relevancy,
+            args.output_file,
         )
     )
 

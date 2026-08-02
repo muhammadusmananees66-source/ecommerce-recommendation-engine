@@ -58,7 +58,8 @@ def main():
     model.save(args.output)
     logger.info(
         "Model trained and saved to %s (final train_loss=%.4f)",
-        args.output, history["train_loss"][-1],
+        args.output,
+        history["train_loss"][-1],
     )
 
 

@@ -139,14 +139,6 @@
 #         self._initialized = False
 
 
-
-
-
-
-
-
-
-
 """
 Vector store with a real (bounded) in-memory fallback.
 
@@ -208,15 +200,16 @@ class VectorStore:
                 return
             except Exception as e:
                 logger.error(
-                    "Pinecone initialization failed (%s); falling back to "
-                    "bounded in-memory vector store", e,
+                    "Pinecone initialization failed (%s); falling back to bounded in-memory vector store",
+                    e,
                 )
 
         self._initialized = True
         logger.info(
             "VectorStore running in-memory (max_size=%d). This is suitable "
             "for dev/CI and as a resilience fallback, not as the sole "
-            "production index for a large catalog.", self.max_size,
+            "production index for a large catalog.",
+            self.max_size,
         )
 
     def add_documents(self, embeddings: np.ndarray, metadatas: List[Dict]) -> None:
@@ -233,9 +226,7 @@ class VectorStore:
 
         if self.index is not None:
             try:
-                results = self.index.query(
-                    vector=vector.tolist(), top_k=top_k, include_metadata=True
-                )
+                results = self.index.query(vector=vector.tolist(), top_k=top_k, include_metadata=True)
                 return [
                     {
                         "id": m["id"],

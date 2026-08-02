@@ -82,7 +82,6 @@ def test_unhandled_exception_does_not_leak_internals(client, monkeypatch, auth_h
     async def boom(*args, **kwargs):
         raise ValueError("some internal secret detail: db_password=hunter2")
 
-
     monkeypatch.setattr(
         "src.api.dependencies.container.Container.rag_pipeline",
         property(lambda self: type("P", (), {"query": boom})()),

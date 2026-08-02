@@ -108,27 +108,6 @@
 #         logger.info("DI container shut down")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 """
 Dependency-injection container: owns the lifecycle of every stateful service
 (model, RAG pipeline, feature store, cache) and wires them together once at
@@ -224,10 +203,7 @@ class Container:
         embedder = self.rag_pipeline.embedder
         texts = (items["title"].astype(str) + ". " + items["description"].astype(str)).tolist()
         vecs = embedder.encode(texts)
-        metas = [
-            {"id": row.item_id, "text": text}
-            for row, text in zip(items.itertuples(), texts)
-        ]
+        metas = [{"id": row.item_id, "text": text} for row, text in zip(items.itertuples(), texts)]
         self.rag_pipeline.retriever.vector_store.add_documents(vecs, metas)
         logger.info("Seeded vector store with %d documents from %s", len(metas), items_path)
 

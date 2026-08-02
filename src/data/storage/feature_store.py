@@ -42,7 +42,10 @@ class FeatureStore:
             try:
                 data = self.redis_client.hgetall(f"user_features:{user_id}")
                 if data:
-                    return {k: (float(v) if k != "user_preference_vector" else json.loads(v)) for k, v in data.items()}
+                    return {
+                        k: (float(v) if k != "user_preference_vector" else json.loads(v))
+                        for k, v in data.items()
+                    }
             except Exception as e:
                 logger.error("Redis feature read failed (%s); using defaults", e)
 

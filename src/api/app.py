@@ -81,7 +81,11 @@ def create_app(config_path: str = None) -> FastAPI:
 
     @app.get("/api/v1/health")
     async def health(request: Request):
-        return {"status": "healthy", "uptime_s": time.time() - request.app.state.start_time, "version": "1.0.0"}
+        return {
+            "status": "healthy",
+            "uptime_s": time.time() - request.app.state.start_time,
+            "version": "1.0.0",
+        }
 
     @app.get("/api/v1/ready")
     async def ready(request: Request):
