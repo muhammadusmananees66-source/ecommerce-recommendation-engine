@@ -28,8 +28,8 @@ async def rag_query(request: Request, body: RAGRequest) -> RAGResponse:
         )
     except TimeoutError as e:
         raise HTTPException(status_code=504, detail=str(e))
-    except Exception as e:
-        logger.error("RAG query failed: %s", e, exc_info=True)
+    except Exception:
+        logger.exception("RAG query failed")
         raise HTTPException(status_code=502, detail="Upstream RAG pipeline failed")
 
     return RAGResponse(

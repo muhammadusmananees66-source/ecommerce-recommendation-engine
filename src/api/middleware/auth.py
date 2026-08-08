@@ -11,7 +11,7 @@ Bugs fixed from earlier iterations:
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 import jwt
 from fastapi import HTTPException, Request
@@ -31,7 +31,7 @@ PUBLIC_PATHS = (
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, app, config: dict[str, Any] | None = None):
         super().__init__(app)
         config = config or {}
         auth_config = config.get("auth", {})
@@ -66,7 +66,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         return parts[1]
 
-    def _verify_token(self, token: str) -> Dict[str, Any]:
+    def _verify_token(self, token: str) -> dict[str, Any]:
         try:
             return jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
         except jwt.ExpiredSignatureError:

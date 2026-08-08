@@ -7,7 +7,7 @@ metric fidelity, not implemented here to keep this runnable without API keys).
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -25,7 +25,7 @@ class RAGEvaluationResult:
 
 
 class RAGEvaluator:
-    def __init__(self, config: Dict[str, Any], embedder: Optional[Embedder] = None):
+    def __init__(self, config: dict[str, Any], embedder: Embedder | None = None):
         self._embedder_config = config.get("embedder", {})
         self._embedder = embedder
         self.faithfulness_threshold = config.get("faithfulness_entailment_threshold", 0.6)
@@ -35,7 +35,7 @@ class RAGEvaluator:
             self._embedder = get_embedder(self._embedder_config)
 
     async def evaluate(
-        self, query: str, answer: str, contexts: List[str], ground_truth: Optional[str] = None
+        self, query: str, answer: str, contexts: list[str], ground_truth: str | None = None
     ) -> RAGEvaluationResult:
         faithfulness = self._faithfulness(answer, contexts)
         relevancy = self._answer_relevancy(query, answer)
@@ -49,7 +49,7 @@ class RAGEvaluator:
             answer_similarity=similarity,
         )
 
-    def _faithfulness(self, answer: str, contexts: List[str]) -> float:
+    def _faithfulness(self, answer: str, contexts: list[str]) -> float:
         """Fraction of answer sentences with high similarity to at least one context chunk."""
         if not contexts or not answer:
             return 0.0
@@ -73,7 +73,7 @@ class RAGEvaluator:
         q, a = self._embedder.encode_one(query), self._embedder.encode_one(answer)
         return float(np.clip(q @ a / (np.linalg.norm(q) * np.linalg.norm(a) + 1e-9), 0.0, 1.0))
 
-    def _context_precision(self, query: str, contexts: List[str]) -> float:
+    def _context_precision(self, query: str, contexts: list[str]) -> float:
         if not contexts:
             return 0.0
         q = self._embedder.encode_one(query)

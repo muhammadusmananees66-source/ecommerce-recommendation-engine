@@ -16,7 +16,7 @@ metrics), and both are exercised by tests/unit/test_recommender.py.
 
 import logging
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -46,11 +46,11 @@ class MatrixFactorizationModel:
         epochs: int = 20,
         lr: float = 0.01,
         reg: float = 0.02,
-        val_user_idx: Optional[np.ndarray] = None,
-        val_item_idx: Optional[np.ndarray] = None,
-        val_ratings: Optional[np.ndarray] = None,
+        val_user_idx: np.ndarray | None = None,
+        val_item_idx: np.ndarray | None = None,
+        val_ratings: np.ndarray | None = None,
         patience: int = 3,
-    ) -> Dict[str, List[float]]:
+    ) -> dict[str, list[float]]:
         self.global_bias = float(np.mean(ratings))
         history = {"train_loss": [], "val_loss": []}
         best_val, no_improve = float("inf"), 0
@@ -120,20 +120,20 @@ class MatrixFactorizationModel:
 
 
 class HybridRecommender:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.config = config
         self.collab_backend = config.get("collab_backend", "mf")
-        self.collab_model: Optional[MatrixFactorizationModel] = None
-        self.content_embeddings: Optional[np.ndarray] = None
-        self.item_ids: List[str] = []
-        self.user_encoder: Dict[str, int] = {}
-        self.item_encoder: Dict[str, int] = {}
+        self.collab_model: MatrixFactorizationModel | None = None
+        self.content_embeddings: np.ndarray | None = None
+        self.item_ids: list[str] = []
+        self.user_encoder: dict[str, int] = {}
+        self.item_encoder: dict[str, int] = {}
         self.is_fitted = False
         self.embedder: Embedder = get_embedder(config.get("embedder", {}))
-        self.user_history: Optional[UserHistoryService] = None
+        self.user_history: UserHistoryService | None = None
         self.alpha = config.get("hybrid_alpha", 0.6)  # weight on collaborative vs content
 
-    def fit(self, interactions: pd.DataFrame, items: pd.DataFrame, text_cols: List[str]) -> Dict[str, Any]:
+    def fit(self, interactions: pd.DataFrame, items: pd.DataFrame, text_cols: list[str]) -> dict[str, Any]:
         logger.info("Fitting hybrid recommender on %d interactions, %d items", len(interactions), len(items))
 
         self.user_encoder = {u: i for i, u in enumerate(interactions["user_id"].unique())}
@@ -174,8 +174,8 @@ class HybridRecommender:
         return history
 
     def recommend(
-        self, user_id: str, n: int = 10, user_items: Optional[List[str]] = None, **kwargs
-    ) -> List[Dict]:
+        self, user_id: str, n: int = 10, user_items: list[str] | None = None, **kwargs
+    ) -> list[dict]:
         if not self.is_fitted:
             raise RuntimeError("Model not fitted -- call fit() or load() first")
         if user_id not in self.user_encoder:
@@ -206,7 +206,7 @@ class HybridRecommender:
             for i in order
         ]
 
-    def _content_scores(self, user_items: List[str]) -> np.ndarray:
+    def _content_scores(self, user_items: list[str]) -> np.ndarray:
         n_items = len(self.item_ids)
         if not user_items:
             # Honest neutral prior, not random noise -- an earlier version of

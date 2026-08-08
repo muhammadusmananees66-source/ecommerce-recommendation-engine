@@ -47,7 +47,8 @@ async def lifespan(app: FastAPI):
     await container.shutdown()
 
 
-def create_app(config_path: str = None) -> FastAPI:
+# def create_app(config_path: str = None) -> FastAPI:
+def create_app(config_path: str | None = None) -> FastAPI:
     app = FastAPI(
         title="RAG + Recommendation Engine",
         description="RAG-based question answering combined with hybrid recommendations",
@@ -99,9 +100,13 @@ def create_app(config_path: str = None) -> FastAPI:
         return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
     @app.exception_handler(Exception)
+    # async def global_exception_handler(request: Request, exc: Exception):
+    #     request_id = getattr(request.state, "request_id", str(uuid.uuid4()))
+    #     logger.error("Unhandled exception [%s]: %s", request_id, exc, exc_info=True)
+    #     return JSONResponse(
     async def global_exception_handler(request: Request, exc: Exception):
         request_id = getattr(request.state, "request_id", str(uuid.uuid4()))
-        logger.error("Unhandled exception [%s]: %s", request_id, exc, exc_info=True)
+        logger.exception("Unhandled exception [%s]: %s", request_id, exc)
         return JSONResponse(
             status_code=500,
             content={

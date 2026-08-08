@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import Any, Dict
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -15,11 +15,11 @@ DEFAULT_FEATURES = {
 
 
 class FeatureStore:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.config = config
         self.redis_client = self._try_connect(config)
 
-    def _try_connect(self, config: Dict[str, Any]):
+    def _try_connect(self, config: dict[str, Any]):
         try:
             import redis
 
@@ -37,7 +37,7 @@ class FeatureStore:
             logger.warning("Redis unavailable for feature store (%s); using default features", e)
             return None
 
-    def get_user_features(self, user_id: str) -> Dict[str, Any]:
+    def get_user_features(self, user_id: str) -> dict[str, Any]:
         if self.redis_client is not None:
             try:
                 data = self.redis_client.hgetall(f"user_features:{user_id}")
@@ -51,7 +51,7 @@ class FeatureStore:
 
         return dict(DEFAULT_FEATURES)
 
-    def set_user_features(self, user_id: str, features: Dict[str, Any]) -> None:
+    def set_user_features(self, user_id: str, features: dict[str, Any]) -> None:
         if self.redis_client is None:
             logger.warning("Feature store has no Redis connection; set_user_features is a no-op")
             return

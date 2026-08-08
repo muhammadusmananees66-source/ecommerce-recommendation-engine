@@ -1,7 +1,7 @@
 """Multi-stage retrieval: vector search -> metadata filtering -> lexical re-boost."""
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class MultiStageRetriever:
-    def __init__(self, config: Dict[str, Any], vector_store: Optional[VectorStore] = None):
+    def __init__(self, config: dict[str, Any], vector_store: VectorStore | None = None):
         self.config = config
         self.vector_store = vector_store or VectorStore(config.get("vector_store", {}))
         self.stages = config.get("stages", ["vector", "filter", "rerank"])
@@ -25,13 +25,13 @@ class MultiStageRetriever:
         self,
         query: str,
         query_embedding: np.ndarray,
-        user_context: Optional[Dict] = None,
+        user_context: dict | None = None,
         max_docs: int = 20,
-    ) -> List[Dict]:
+    ) -> list[dict]:
         if not self._initialized:
             raise RuntimeError("MultiStageRetriever not initialized")
 
-        docs: List[Dict] = []
+        docs: list[dict] = []
 
         if "vector" in self.stages:
             docs = await self.vector_store.query(query_embedding, top_k=max_docs * 2)
@@ -45,7 +45,7 @@ class MultiStageRetriever:
         return docs[:max_docs]
 
     @staticmethod
-    def _apply_filters(docs: List[Dict], user_context: Optional[Dict]) -> List[Dict]:
+    def _apply_filters(docs: list[dict], user_context: dict | None) -> list[dict]:
         if not user_context:
             return docs
 
@@ -69,7 +69,7 @@ class MultiStageRetriever:
         return filtered
 
     @staticmethod
-    def _lexical_boost(query: str, docs: List[Dict]) -> List[Dict]:
+    def _lexical_boost(query: str, docs: list[dict]) -> list[dict]:
         query_terms = set(query.lower().split())
         for doc in docs:
             text = doc.get("metadata", {}).get("text", "") or doc.get("text", "")

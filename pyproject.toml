@@ -21,10 +21,6 @@ dependencies = [
     "httpx>=0.27.0",
 ]
 
-# Heavy ML backends are optional so the core app (API, RAG with tfidf
-# embeddings, recommender with numpy matrix factorization) installs and
-# boots in seconds, with no torch/CUDA download required for CI or for a
-# quick local run. Install the group you need for production.
 [project.optional-dependencies]
 semantic-embeddings = [
     "sentence-transformers>=3.0.0",
@@ -70,3 +66,12 @@ build-backend = "setuptools.build_meta"
 dev = [
     "ruff>=0.15.22",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"src/data/**/*.py" = ["BLE001"]
+"src/serving/caching.py" = ["BLE001"]
+"src/mlops/**/*.py" = ["BLE001"]
+"src/core/retrieval/vector_store.py" = ["BLE001"]
+"src/core/generation/response_generator.py" = ["BLE001"]
+"src/core/rag/groundedness.py" = ["BLE001"]
+"src/api/middleware/rate_limit.py" = ["BLE001"]

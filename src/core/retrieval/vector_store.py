@@ -157,7 +157,7 @@ Design notes, addressing bugs found in earlier iterations of this project:
 
 import logging
 from collections import deque
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 
@@ -165,7 +165,7 @@ logger = logging.getLogger(__name__)
 
 
 class VectorStore:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.config = config
         self.backend = config.get("backend", "memory")
         self.max_size = config.get("max_size", 50_000)
@@ -212,14 +212,14 @@ class VectorStore:
             self.max_size,
         )
 
-    def add_documents(self, embeddings: np.ndarray, metadatas: List[Dict]) -> None:
+    def add_documents(self, embeddings: np.ndarray, metadatas: list[dict]) -> None:
         """Add documents to the in-memory store. Real data only -- caller's responsibility."""
         for emb, meta in zip(embeddings, metadatas):
             self._ids.append(meta.get("id", str(len(self._ids))))
             self._embeddings.append(np.asarray(emb, dtype=np.float32))
             self._metadata.append(meta)
 
-    async def query(self, vector: np.ndarray, top_k: int = 10, **kwargs) -> List[Dict]:
+    async def query(self, vector: np.ndarray, top_k: int = 10, **kwargs) -> list[dict]:
         if not self._initialized:
             logger.error("VectorStore.query called before initialize()")
             return []

@@ -1,7 +1,7 @@
 """Routes a query to the best available LLM given cost/latency/quality tradeoffs."""
 
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ DEFAULT_MODEL_CAPABILITIES = {
 
 
 class LLMRouter:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.capabilities = {**DEFAULT_MODEL_CAPABILITIES, **config.get("model_capabilities", {})}
         self.available = config.get("available_models", list(self.capabilities.keys()))
         self.fallback_chain = config.get("fallback_chain", self.available)
@@ -28,7 +28,7 @@ class LLMRouter:
     async def initialize(self) -> None:
         self._initialized = True
 
-    def route(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
+    def route(self, query: str, context: dict[str, Any]) -> dict[str, Any]:
         if not self._initialized:
             raise RuntimeError("LLMRouter not initialized")
 
@@ -51,7 +51,7 @@ class LLMRouter:
         model, score, caps = scored[0]
         return {"model": model, "score": score, "max_tokens": caps["max_tokens"]}
 
-    def get_fallback_chain(self, primary: str) -> List[str]:
+    def get_fallback_chain(self, primary: str) -> list[str]:
         chain = [m for m in self.fallback_chain if m != primary]
         return chain
 

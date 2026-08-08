@@ -115,7 +115,7 @@ startup, per FastAPI's lifespan hook.
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 from src.core.models.hybrid import HybridRecommender
 from src.core.rag.pipeline import RAGPipeline
@@ -129,14 +129,14 @@ logger = logging.getLogger(__name__)
 
 
 class Container:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.config = config
-        self.predictor: Optional[Predictor] = None
-        self.rag_pipeline: Optional[RAGPipeline] = None
-        self.feature_store: Optional[FeatureStore] = None
-        self.user_history: Optional[UserHistoryService] = None
-        self.cache_manager: Optional[CacheManager] = None
-        self.monitor: Optional[RAGMonitor] = None
+        self.predictor: Predictor | None = None
+        self.rag_pipeline: RAGPipeline | None = None
+        self.feature_store: FeatureStore | None = None
+        self.user_history: UserHistoryService | None = None
+        self.cache_manager: CacheManager | None = None
+        self.monitor: RAGMonitor | None = None
 
     async def init(self) -> None:
         logger.info("Initializing DI container...")

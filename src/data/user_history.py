@@ -9,18 +9,18 @@ substitute for Redis actually being up in production.
 """
 
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class UserHistoryService:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.config = config
-        self._memory: Dict[str, List[Dict]] = {}
+        self._memory: dict[str, list[dict]] = {}
         self.redis_client = self._try_connect(config)
 
-    def _try_connect(self, config: Dict[str, Any]):
+    def _try_connect(self, config: dict[str, Any]):
         try:
             import redis
 
@@ -38,13 +38,13 @@ class UserHistoryService:
             logger.warning("Redis unavailable for user history (%s); using in-memory fallback", e)
             return None
 
-    def get_user_items(self, user_id: str) -> List[str]:
+    def get_user_items(self, user_id: str) -> list[str]:
         if self.redis_client is not None:
             try:
                 return list(self.redis_client.smembers(f"user_items:{user_id}"))
             except Exception as e:
-                logger.error("Redis read failed (%s); falling back to memory for this call", e)
-
+                logger.warning("Redis read failed (%s); falling back to memory for this call", e)
+                # fall through to the in-memory path below instead of returning None
         return [entry["item_id"] for entry in self._memory.get(user_id, [])]
 
     def add_user_item(self, user_id: str, item_id: str, rating: float = 1.0) -> None:
@@ -53,7 +53,8 @@ class UserHistoryService:
                 key = f"user_items:{user_id}"
                 self.redis_client.sadd(key, item_id)
                 self.redis_client.expire(key, 60 * 60 * 24 * 30)
+                return
             except Exception as e:
-                logger.error("Redis write failed (%s); recording in memory only", e)
-
+                logger.warning("Redis write failed (%s); recording in memory only", e)
+                # fall through to the in-memory write below
         self._memory.setdefault(user_id, []).append({"item_id": item_id, "rating": rating})

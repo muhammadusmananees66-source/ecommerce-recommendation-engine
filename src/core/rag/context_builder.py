@@ -6,7 +6,7 @@ context (both are attacker-influenced surfaces in a RAG system).
 
 import logging
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -24,12 +24,12 @@ _INJECTION_PATTERNS = [
 
 
 class ContextBuilder:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.max_context_chars = config.get("max_context_chars", 8000)
         self.max_docs_in_context = config.get("max_docs_in_context", 5)
         self.sanitize = config.get("sanitize_inputs", True)
 
-    def build(self, query: str, docs: List[Dict], user_context: Optional[Dict] = None) -> Dict[str, Any]:
+    def build(self, query: str, docs: list[dict], user_context: dict | None = None) -> dict[str, Any]:
         context = {
             "query": self._sanitize_text(query),
             "documents": [self._sanitize_doc(d) for d in docs[: self.max_docs_in_context]],
@@ -46,14 +46,14 @@ class ContextBuilder:
                 text = pattern.sub("[REDACTED]", text)
         return text[: self.max_context_chars]
 
-    def _sanitize_doc(self, doc: Dict) -> Dict:
+    def _sanitize_doc(self, doc: dict) -> dict:
         return {
             "id": doc.get("id", ""),
             "text": self._sanitize_text(doc.get("text", "")),
             "score": doc.get("score", 0.0),
         }
 
-    def _sanitize_dict(self, d: Dict) -> Dict:
+    def _sanitize_dict(self, d: dict) -> dict:
         out = {}
         for k, v in d.items():
             if isinstance(v, str):
@@ -65,7 +65,7 @@ class ContextBuilder:
         return out
 
     @staticmethod
-    def _render(context: Dict) -> str:
+    def _render(context: dict) -> str:
         lines = [f"Query: {context['query']}", "", "Retrieved documents:"]
         for i, doc in enumerate(context["documents"], start=1):
             lines.append(f"[{i}] {doc['text']}")

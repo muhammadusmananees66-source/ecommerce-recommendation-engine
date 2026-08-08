@@ -6,7 +6,7 @@ silently do nothing. If MLflow isn't reachable, callers need to know loudly.
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class ModelRegistryUnavailableError(RuntimeError):
 
 
 class ModelRegistry:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.tracking_uri = config.get("tracking_uri", "http://localhost:5000")
         self.model_name = config.get("model_name", "rag-recommendation")
         self._client = None
@@ -48,7 +48,7 @@ class ModelRegistry:
             )
         return result.version
 
-    def get_latest_version(self, stage: str = "Production") -> Optional[Dict[str, Any]]:
+    def get_latest_version(self, stage: str = "Production") -> dict[str, Any] | None:
         self._require_client()
         versions = self._client.get_latest_versions(self.model_name, stages=[stage])
         if not versions:

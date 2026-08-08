@@ -15,8 +15,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.core.embeddings import get_embedder  # noqa: E402
-from src.core.retrieval.vector_store import VectorStore  # noqa: E402
+from src.core.embeddings import get_embedder
+from src.core.retrieval.vector_store import VectorStore
 
 
 async def seed(items_path: str, vector_store: VectorStore) -> int:
