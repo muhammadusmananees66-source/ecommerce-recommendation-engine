@@ -43,7 +43,9 @@ class TfidfEmbedder:
         from sklearn.feature_extraction.text import HashingVectorizer
 
         self.dim = dim
-        self._vectorizer = HashingVectorizer(n_features=dim, alternate_sign=False, norm="l2")
+        self._vectorizer = HashingVectorizer(
+            n_features=dim, alternate_sign=False, norm="l2"
+        )
 
     def encode(self, texts: List[str]) -> np.ndarray:
         if not texts:
@@ -92,7 +94,6 @@ def get_embedder(config: dict) -> Embedder:
         except ImportError as e:
             logger.warning(
                 "sentence-transformers backend requested but not installed (%s); "
-                "falling back to tfidf embedder",
-                e,
+                "falling back to tfidf embedder", e,
             )
     return TfidfEmbedder(dim=config.get("dim", 256))

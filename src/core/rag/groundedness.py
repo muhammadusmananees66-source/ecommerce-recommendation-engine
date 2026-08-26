@@ -38,9 +38,7 @@ class GroundednessChecker:
 
                 self._nli_pipeline = pipeline("text-classification", model="roberta-large-mnli", device=-1)
             except ImportError as e:
-                logger.warning(
-                    "NLI groundedness requested but transformers not installed (%s); using semantic", e
-                )
+                logger.warning("NLI groundedness requested but transformers not installed (%s); using semantic", e)
                 self.method = "semantic"
         self._initialized = True
 
@@ -57,8 +55,8 @@ class GroundednessChecker:
             return 0.0
         response_vec = self._embedder.encode_one(response)
         doc_vecs = self._embedder.encode(texts)
-        sims = (
-            doc_vecs @ response_vec / (np.linalg.norm(doc_vecs, axis=1) * np.linalg.norm(response_vec) + 1e-9)
+        sims = doc_vecs @ response_vec / (
+            np.linalg.norm(doc_vecs, axis=1) * np.linalg.norm(response_vec) + 1e-9
         )
         return float(np.clip(np.max(sims), 0.0, 1.0))
 

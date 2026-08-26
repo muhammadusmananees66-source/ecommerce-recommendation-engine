@@ -62,7 +62,9 @@ class RAGEvaluator:
 
         supported = 0
         for cv in claim_vecs:
-            sims = context_vecs @ cv / (np.linalg.norm(context_vecs, axis=1) * np.linalg.norm(cv) + 1e-9)
+            sims = context_vecs @ cv / (
+                np.linalg.norm(context_vecs, axis=1) * np.linalg.norm(cv) + 1e-9
+            )
             if np.max(sims) >= self.faithfulness_threshold:
                 supported += 1
         return supported / len(claims)

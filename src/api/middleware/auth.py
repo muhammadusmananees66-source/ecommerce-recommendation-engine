@@ -60,9 +60,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         parts = auth_header.split()
         if len(parts) != 2 or parts[0].lower() != "bearer":
-            raise HTTPException(
-                status_code=401, detail="Invalid authorization format, expected 'Bearer <token>'"
-            )
+            raise HTTPException(status_code=401, detail="Invalid authorization format, expected 'Bearer <token>'")
 
         return parts[1]
 

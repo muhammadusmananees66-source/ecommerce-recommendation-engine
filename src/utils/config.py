@@ -28,7 +28,7 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     for key, value in os.environ.items():
         if not key.startswith(ENV_PREFIX):
             continue
-        config_key = key[len(ENV_PREFIX) :].lower()
+        config_key = key[len(ENV_PREFIX):].lower()
         config[config_key] = _parse_env_value(value)
 
     return config
