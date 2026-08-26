@@ -21,8 +21,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.api.dependencies.container import Container  # noqa: E402
-from src.evaluation.rag_evaluator import RAGEvaluator  # noqa: E402
+from src.api.dependencies.container import Container
+from src.evaluation.rag_evaluator import RAGEvaluator
 
 
 async def run_evaluation(
@@ -83,8 +83,17 @@ async def run_evaluation(
         "detailed_results": results,
     }
 
-    with open(output_file, "w") as f:
-        json.dump(output, f, indent=2)
+    # with open(output_file, "w") as f:
+    #     json.dump(output, f, indent=2)
+    # import asyncio
+    # await asyncio.to_thread(lambda: json.dump(output, open(output_file, "w"), indent=2))
+    import asyncio
+    
+    def _write_output():
+        with open(output_file, "w") as f:
+            json.dump(output, f, indent=2)
+    
+    await asyncio.to_thread(_write_output)
 
     return output
 

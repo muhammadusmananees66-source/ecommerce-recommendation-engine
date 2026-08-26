@@ -16,7 +16,7 @@ Design notes (fixing bugs found in earlier iterations of this project):
 
 import asyncio
 import logging
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
@@ -28,7 +28,7 @@ class AllProvidersFailedError(RuntimeError):
 
 
 class ResponseGenerator:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.api_keys = config.get("api_keys", {})
         self.timeout = config.get("timeout", 30)
         self.llm_router = None  # wired by RAGPipeline after construction
@@ -110,13 +110,13 @@ class ResponseGenerator:
 
     async def generate_with_fallback(
         self, prompt: str, model: str, temperature: float = 0.7, **kwargs
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         if not self._initialized:
             raise RuntimeError("ResponseGenerator not initialized")
 
         chain = [model] + (self.llm_router.get_fallback_chain(model) if self.llm_router else [])
 
-        last_error: Optional[Exception] = None
+        last_error: Exception | None = None
         for attempt, current_model in enumerate(chain):
             try:
                 response = await asyncio.wait_for(

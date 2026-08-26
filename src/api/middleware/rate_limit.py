@@ -9,7 +9,7 @@ is used, not a silently-broken Redis client kept truthy).
 
 import logging
 import time
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 from fastapi import HTTPException, Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -20,7 +20,7 @@ EXEMPT_PATHS = ("/api/v1/health", "/api/v1/ready", "/metrics")
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, app, config: dict[str, Any] | None = None):
         super().__init__(app)
         config = config or {}
         self.rate_limit = config.get("rate_limiting", {}).get("requests_per_minute", 100)
@@ -28,13 +28,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.max_tracked_clients = config.get("rate_limiting", {}).get("max_tracked_clients", 20_000)
 
         self.redis_client = None
-        self._memory_store: Dict[str, list] = {}
+        self._memory_store: dict[str, list] = {}
 
         redis_config = config.get("redis", {})
         if redis_config.get("enabled", True):
             self.redis_client = self._try_connect_redis(redis_config)
 
-    def _try_connect_redis(self, redis_config: Dict[str, Any]):
+    def _try_connect_redis(self, redis_config: dict[str, Any]):
         try:
             import redis
 
@@ -82,7 +82,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         response.headers["X-RateLimit-Remaining"] = str(remaining)
         return response
 
-    def _check_redis(self, client_ip: str) -> Tuple[bool, int]:
+    def _check_redis(self, client_ip: str) -> tuple[bool, int]:
         try:
             key = f"rate_limit:{client_ip}"
             pipe = self.redis_client.pipeline()
@@ -95,7 +95,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             logger.error("Redis rate check failed mid-request (%s); using memory for this request", e)
             return self._check_memory(client_ip, int(time.time()))
 
-    def _check_memory(self, client_ip: str, now: int) -> Tuple[bool, int]:
+    def _check_memory(self, client_ip: str, now: int) -> tuple[bool, int]:
         bucket = self._memory_store.setdefault(client_ip, [])
         bucket[:] = [t for t in bucket if now - t < self.window]
 

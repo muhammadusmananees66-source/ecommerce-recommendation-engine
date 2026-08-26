@@ -1,7 +1,7 @@
 """Ranks retrieved documents by relevance to the query before they reach the LLM."""
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class RelevanceRanker:
-    def __init__(self, config: Dict[str, Any], embedder: Optional[Embedder] = None):
+    def __init__(self, config: dict[str, Any], embedder: Embedder | None = None):
         self._embedder_config = config.get("embedder", {})
         self._embedder = embedder
         self.method = config.get("method", "hybrid")
@@ -24,7 +24,7 @@ class RelevanceRanker:
             self._embedder = get_embedder(self._embedder_config)
         return self._embedder
 
-    def rank(self, query: str, docs: List[Dict], user_context: Optional[Dict] = None) -> List[Dict]:
+    def rank(self, query: str, docs: list[dict], user_context: dict | None = None) -> list[dict]:
         if not docs:
             return []
         if self.method == "semantic":
@@ -33,7 +33,7 @@ class RelevanceRanker:
             return self._rank_lexical(query, docs)
         return self._rank_hybrid(query, docs)
 
-    def _rank_semantic(self, query: str, docs: List[Dict]) -> List[Dict]:
+    def _rank_semantic(self, query: str, docs: list[dict]) -> list[dict]:
         embedder = self._get_embedder()
         q = embedder.encode_one(query)
         texts = [d.get("text", "") for d in docs]
@@ -44,7 +44,7 @@ class RelevanceRanker:
             doc["score"] = float(s)
         return sorted(docs, key=lambda d: d["score"], reverse=True)
 
-    def _rank_lexical(self, query: str, docs: List[Dict]) -> List[Dict]:
+    def _rank_lexical(self, query: str, docs: list[dict]) -> list[dict]:
         from sklearn.feature_extraction.text import TfidfVectorizer
 
         texts = [d.get("text", "") for d in docs]
@@ -63,7 +63,7 @@ class RelevanceRanker:
             doc["score"] = float(s)
         return sorted(docs, key=lambda d: d["score"], reverse=True)
 
-    def _rank_hybrid(self, query: str, docs: List[Dict]) -> List[Dict]:
+    def _rank_hybrid(self, query: str, docs: list[dict]) -> list[dict]:
         semantic = self._rank_semantic(query, [dict(d) for d in docs])
         lexical = self._rank_lexical(query, [dict(d) for d in docs])
 

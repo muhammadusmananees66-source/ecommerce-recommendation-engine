@@ -56,7 +56,8 @@ async def test_semantic_cache_survives_mass_expiry_without_crashing():
     for i in range(10):
         await cache.set(f"query {i}", FakeResult(f"answer {i}"))
 
-    result, score = await cache.get_similar_with_score("query 0")
+    # result, score = await cache.get_similar_with_score("query 0")
+    result, _score = await cache.get_similar_with_score("query 0")
     assert result is None
     assert len(cache) == 0
 

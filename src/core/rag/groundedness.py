@@ -9,7 +9,7 @@ retrieved documents. Two methods:
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class GroundednessChecker:
-    def __init__(self, config: Dict[str, Any], embedder: Optional[Embedder] = None):
+    def __init__(self, config: dict[str, Any], embedder: Embedder | None = None):
         self._embedder_config = config.get("embedder", {})
         self._embedder = embedder
         self.method = config.get("method", "semantic")
@@ -42,14 +42,14 @@ class GroundednessChecker:
                 self.method = "semantic"
         self._initialized = True
 
-    async def check(self, query: str, response: str, docs: List[Dict]) -> float:
+    async def check(self, query: str, response: str, docs: list[dict]) -> float:
         if not self._initialized or not docs or not response:
             return 0.0
         if self.method == "nli" and self._nli_pipeline:
             return self._check_nli(response, docs)
         return self._check_semantic(response, docs)
 
-    def _check_semantic(self, response: str, docs: List[Dict]) -> float:
+    def _check_semantic(self, response: str, docs: list[dict]) -> float:
         texts = [d.get("text", "") for d in docs if d.get("text")]
         if not texts:
             return 0.0
@@ -60,7 +60,7 @@ class GroundednessChecker:
         )
         return float(np.clip(np.max(sims), 0.0, 1.0))
 
-    def _check_nli(self, response: str, docs: List[Dict]) -> float:
+    def _check_nli(self, response: str, docs: list[dict]) -> float:
         claims = [s.strip() for s in response.split(".") if len(s.strip()) > 10]
         if not claims:
             return 0.0

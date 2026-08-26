@@ -17,8 +17,11 @@ async def get_recommendations(request: Request, body: RecommendationRequest) -> 
 
     try:
         recommendations = await predictor.get_recommendations(user_id=body.user_id, n=body.n)
-    except Exception as e:
-        logger.error("Recommendation request failed: %s", e, exc_info=True)
+    # except Exception as e:
+    #     logger.error("Recommendation request failed: %s", e, exc_info=True)
+    #     raise HTTPException(status_code=502, detail="Recommendation service failed")
+    except Exception:
+        logger.exception("Recommendation request failed")
         raise HTTPException(status_code=502, detail="Recommendation service failed")
 
     return RecommendationResponse(

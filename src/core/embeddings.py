@@ -17,7 +17,7 @@ Both implement the same interface: encode(texts) -> np.ndarray of shape
 """
 
 import logging
-from typing import List, Protocol
+from typing import Protocol
 
 import numpy as np
 
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class Embedder(Protocol):
     dim: int
 
-    def encode(self, texts: List[str]) -> np.ndarray: ...
+    def encode(self, texts: list[str]) -> np.ndarray: ...
 
     def encode_one(self, text: str) -> np.ndarray: ...
 
@@ -47,7 +47,7 @@ class TfidfEmbedder:
             n_features=dim, alternate_sign=False, norm="l2"
         )
 
-    def encode(self, texts: List[str]) -> np.ndarray:
+    def encode(self, texts: list[str]) -> np.ndarray:
         if not texts:
             return np.zeros((0, self.dim), dtype=np.float32)
         matrix = self._vectorizer.transform(texts)
@@ -71,7 +71,7 @@ class SentenceTransformerEmbedder:
         self._model = SentenceTransformer(model_name)
         self.dim = self._model.get_sentence_embedding_dimension()
 
-    def encode(self, texts: List[str]) -> np.ndarray:
+    def encode(self, texts: list[str]) -> np.ndarray:
         if not texts:
             return np.zeros((0, self.dim), dtype=np.float32)
         return np.asarray(self._model.encode(texts), dtype=np.float32)

@@ -11,7 +11,7 @@ import copy
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.core.embeddings import Embedder, get_embedder
 from src.core.generation.llm_router import LLMRouter
@@ -29,12 +29,12 @@ logger = logging.getLogger(__name__)
 @dataclass
 class RAGResult:
     query: str
-    retrieved_docs: List[Dict] = field(default_factory=list)
+    retrieved_docs: list[dict] = field(default_factory=list)
     generated_response: str = ""
-    context: Dict = field(default_factory=dict)
+    context: dict = field(default_factory=dict)
     confidence_score: float = 0.0
     latency_ms: float = 0.0
-    sources: List[Dict] = field(default_factory=list)
+    sources: list[dict] = field(default_factory=list)
     groundedness_score: float = 0.0
     model_used: str = "unknown"
     cached: bool = False
@@ -42,7 +42,7 @@ class RAGResult:
 
 
 class RAGPipeline:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.config = config
         self.timeout = config.get("timeout", 30)
 
@@ -71,7 +71,7 @@ class RAGPipeline:
     async def query(
         self,
         query: str,
-        user_context: Optional[Dict] = None,
+        user_context: dict | None = None,
         max_docs: int = 10,
         temperature: float = 0.7,
     ) -> RAGResult:
@@ -82,12 +82,12 @@ class RAGPipeline:
                 self._query_internal(query, user_context, max_docs, temperature),
                 timeout=self.timeout,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.error("RAG query timed out after %ds: %r", self.timeout, query)
             raise TimeoutError(f"RAG query timed out after {self.timeout}s")
 
     async def _query_internal(
-        self, query: str, user_context: Optional[Dict], max_docs: int, temperature: float
+        self, query: str, user_context: dict | None, max_docs: int, temperature: float
     ) -> RAGResult:
         start = time.time()
 
@@ -138,7 +138,7 @@ class RAGPipeline:
         return result
 
     @staticmethod
-    def _calculate_confidence(docs: List[Dict], response: str, groundedness: float) -> float:
+    def _calculate_confidence(docs: list[dict], response: str, groundedness: float) -> float:
         if not docs:
             return 0.0
         import numpy as np

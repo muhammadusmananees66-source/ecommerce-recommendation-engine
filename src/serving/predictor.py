@@ -77,7 +77,7 @@ this pipeline.
 import asyncio
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.core.models.hybrid import HybridRecommender
 from src.data.storage.feature_store import FeatureStore
@@ -91,8 +91,8 @@ class Predictor:
         self,
         model: HybridRecommender,
         feature_store: FeatureStore,
-        user_history: Optional[UserHistoryService],
-        config: Dict[str, Any],
+        user_history: UserHistoryService | None,
+        config: dict[str, Any],
     ):
         self.model = model
         self.feature_store = feature_store
@@ -100,7 +100,7 @@ class Predictor:
         self.model_version = config.get("version", "1.0.0")
         self._executor = ThreadPoolExecutor(max_workers=config.get("max_workers", 4))
 
-    async def get_recommendations(self, user_id: str, n: int = 10, **kwargs) -> List[Dict[str, Any]]:
+    async def get_recommendations(self, user_id: str, n: int = 10, **kwargs) -> list[dict[str, Any]]:
         if not self.model.is_fitted:
             logger.warning(
                 "Recommendation requested for user '%s' but no model is trained/loaded yet; "
@@ -111,7 +111,7 @@ class Predictor:
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(self._executor, self._get_recommendations_sync, user_id, n)
 
-    def _get_recommendations_sync(self, user_id: str, n: int) -> List[Dict[str, Any]]:
+    def _get_recommendations_sync(self, user_id: str, n: int) -> list[dict[str, Any]]:
         user_items = self.user_history.get_user_items(user_id) if self.user_history else []
         return self.model.recommend(user_id=user_id, n=n, user_items=user_items)
 

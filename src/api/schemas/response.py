@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -9,7 +9,7 @@ class RAGResponse(BaseModel):
     response: str
     confidence_score: float
     groundedness_score: float
-    sources: List[Dict[str, Any]]
+    sources: list[dict[str, Any]]
     latency_ms: float
     model_used: str
     cached: bool
@@ -18,6 +18,6 @@ class RAGResponse(BaseModel):
 class RecommendationResponse(BaseModel):
     request_id: str
     user_id: str
-    recommendations: List[Dict[str, Any]]
+    recommendations: list[dict[str, Any]]
     total_count: int
     model_version: str

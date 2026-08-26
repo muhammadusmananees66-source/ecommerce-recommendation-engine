@@ -9,7 +9,7 @@ cannot raise "dictionary changed size during iteration".
 
 import logging
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -19,14 +19,14 @@ logger = logging.getLogger(__name__)
 
 
 class SemanticCache:
-    def __init__(self, config: Dict[str, Any], embedder: Optional[Embedder] = None):
+    def __init__(self, config: dict[str, Any], embedder: Embedder | None = None):
         self.max_size = config.get("max_size", 1000)
         self.ttl = config.get("ttl_seconds", 3600)
         self.threshold = config.get("similarity_threshold", 0.85)
         self._embedder_config = config.get("embedder", {})
         self._embedder = embedder
-        self.cache: Dict[str, Tuple[np.ndarray, Any, float]] = {}
-        self.access_order: List[str] = []
+        self.cache: dict[str, tuple[np.ndarray, Any, float]] = {}
+        self.access_order: list[str] = []
         self._initialized = False
 
     async def initialize(self) -> None:
@@ -37,7 +37,7 @@ class SemanticCache:
         self._initialized = True
         logger.info("SemanticCache initialized (threshold=%.2f, ttl=%ds)", self.threshold, self.ttl)
 
-    async def get_similar_with_score(self, query: str) -> Tuple[Optional[Any], float]:
+    async def get_similar_with_score(self, query: str) -> tuple[Any | None, float]:
         if not self._initialized or not self.cache:
             return None, 0.0
 
@@ -45,7 +45,7 @@ class SemanticCache:
         now = time.time()
 
         best_match, best_score, best_key = None, 0.0, None
-        expired_keys: List[str] = []
+        expired_keys: list[str] = []
 
         for key, (emb, value, timestamp) in self.cache.items():
             if now - timestamp > self.ttl:
@@ -65,7 +65,7 @@ class SemanticCache:
 
         return None, 0.0
 
-    async def get_similar(self, query: str) -> Optional[Any]:
+    async def get_similar(self, query: str) -> Any | None:
         result, _ = await self.get_similar_with_score(query)
         return result
 

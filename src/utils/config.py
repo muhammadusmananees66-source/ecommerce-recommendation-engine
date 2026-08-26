@@ -8,16 +8,16 @@ standard 12-factor precedence.
 """
 
 import os
-from typing import Any, Dict, Optional
+from typing import Any
 
 import yaml
 
 ENV_PREFIX = "RAG_"
 
 
-def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
+def load_config(config_path: str | None = None) -> dict[str, Any]:
     """Load configuration from a YAML file and/or environment variables."""
-    config: Dict[str, Any] = {}
+    config: dict[str, Any] = {}
 
     if config_path and os.path.exists(config_path):
         with open(config_path) as f:
