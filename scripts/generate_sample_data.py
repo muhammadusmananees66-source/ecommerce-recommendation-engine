@@ -63,9 +63,7 @@ def main():
     interactions.to_parquet(out_dir / "interactions.parquet", index=False)
     rag_eval.to_parquet(out_dir / "rag_test.parquet", index=False)
 
-    print(
-        f"Wrote {len(items)} items, {len(interactions)} interactions, {len(rag_eval)} eval rows to {out_dir}"
-    )
+    print(f"Wrote {len(items)} items, {len(interactions)} interactions, {len(rag_eval)} eval rows to {out_dir}")
 
 
 if __name__ == "__main__":

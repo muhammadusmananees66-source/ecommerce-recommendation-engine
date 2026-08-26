@@ -15,8 +15,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.core.embeddings import get_embedder
-from src.core.retrieval.vector_store import VectorStore
+from src.core.embeddings import get_embedder  # noqa: E402
+from src.core.retrieval.vector_store import VectorStore  # noqa: E402
 
 
 async def seed(items_path: str, vector_store: VectorStore) -> int:
@@ -25,12 +25,7 @@ async def seed(items_path: str, vector_store: VectorStore) -> int:
     texts = (items["title"].astype(str) + ". " + items["description"].astype(str)).tolist()
     vecs = embedder.encode(texts)
     metas = [
-        {
-            "id": row.item_id,
-            "text": text,
-            "category": getattr(row, "category", None),
-            "price": getattr(row, "price", None),
-        }
+        {"id": row.item_id, "text": text, "category": getattr(row, "category", None), "price": getattr(row, "price", None)}
         for row, text in zip(items.itertuples(), texts)
     ]
     vector_store.add_documents(vecs, metas)

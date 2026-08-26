@@ -21,7 +21,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.core.models.hybrid import HybridRecommender
+from src.core.models.hybrid import HybridRecommender  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -58,8 +58,7 @@ def main():
     model.save(args.output)
     logger.info(
         "Model trained and saved to %s (final train_loss=%.4f)",
-        args.output,
-        history["train_loss"][-1],
+        args.output, history["train_loss"][-1],
     )
 
 
